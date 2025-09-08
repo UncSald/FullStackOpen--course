@@ -25,7 +25,7 @@ const App = () => {
   const Person = (props) => {
       const DeletePerson = (event) => {
       event.preventDefault()
-      if (window.confirm("Delete", `${props.name}`)) {
+      if (window.confirm(`Delete ${props.name} ?`)) {
       personService
         .delete_person(props.id)
         .then(response => {
