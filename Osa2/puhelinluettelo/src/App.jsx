@@ -1,104 +1,6 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
 
-
-
-const Person = (props) => {
-  return (
-    <p>
-      {props.name} {props.number}
-    </p>
-  )
-}
-
-const ListPerson = ({numbersToShow}) => {
-  return (
-    <>
-      {numbersToShow.map(person =>
-        <Person
-          key={person.name} 
-          name={person.name}
-          number={person.number}/>
-        )
-      }
-    </>
-  )
-}
-
-const Filter = ({numbersShown,setShowNumbers}) => {
-  const handleFilter = (event) => {
-    setShowNumbers(event.target.value)
-  }
-  return (
-    <div>
-        filter: 
-        <input
-          value={numbersShown}
-          onChange={handleFilter}
-        />
-      </div>
-  )
-}
-
-const PersonForm = ({persons, setPersons, newName, setNewName, newNumber, setNewNumber}) => {
-  const handleNameChange = (event) => {
-    setNewName(event.target.value)
-  }
-
-  const handleNumberChange = (event) => {
-    setNewNumber(event.target.value)
-  }
-
-  const nameInBook = (newName) => {
-    const found = persons.find((props) => props.name === newName)
-    return found
-  }
-
-  const addPerson = (event) => {
-    event.preventDefault()
-    
-    if (nameInBook(newName) != undefined) {
-      alert(`${newName} is already added to phonebook`)
-    }
-    else {
-    const personObject = {
-      name: newName,
-      number: newNumber,
-      id: String(persons.length + 1),
-    }
-    personService
-      .create(personObject)
-      .then(response => {
-        setPersons(persons.concat(response.data))
-        setNewName('')
-        setNewNumber('')
-      })
-  }
-  }
-  return (
-    <form onSubmit={addPerson}>
-      <div>
-        name: 
-        <input
-          value={newName}
-          onChange={handleNameChange}
-        />
-      </div>
-      <div>
-        number:
-        <input
-        value={newNumber}
-        onChange={handleNumberChange}
-        />
-      </div>
-      <div>
-        <button type="submit">add</button>
-      </div>
-    </form>
-  )
-}
-
-
 const App = () => {
 
   const [persons, setPersons] = useState([])
@@ -119,6 +21,114 @@ const App = () => {
   ? persons
   : persons.filter(person => person.name.toLowerCase().match(numbersShown.toLowerCase()))
 
+
+  const Person = (props) => {
+      const DeletePerson = (event) => {
+      event.preventDefault()
+      if (window.confirm("Delete", `${props.name}`)) {
+      personService
+        .delete_person(props.id)
+        .then(response => {
+          const newData=persons.filter(person => person.id !=(props.id))
+          return setPersons(newData)
+        })}
+    }
+    return (
+      <div>
+        <form onSubmit={DeletePerson}><p>{props.name} {props.number} <button type="submit">delete</button></p></form>
+      </div>
+    )
+  }
+
+  const ListPerson = () => {
+    return (
+      <>
+        {numbersToShow.map(person =>
+          <Person
+          key={person.name} 
+          id={person.id}
+          name={person.name}
+          number={person.number}/>
+          )
+        }
+      </>
+    )
+  }
+
+  const Filter = ({numbersShown,setShowNumbers}) => {
+    const handleFilter = (event) => {
+      setShowNumbers(event.target.value)
+    }
+    return (
+      <div>
+          filter: 
+          <input
+            value={numbersShown}
+            onChange={handleFilter}
+          />
+        </div>
+    )
+  }
+
+  const PersonForm = () => {
+    const handleNameChange = (event) => {
+      setNewName(event.target.value)
+    }
+
+    const handleNumberChange = (event) => {
+      setNewNumber(event.target.value)
+    }
+
+    const nameInBook = (newName) => {
+      const found = persons.find((props) => props.name === newName)
+      return found
+    }
+
+    const addPerson = (event) => {
+      event.preventDefault()
+      
+      if (nameInBook(newName) != undefined) {
+        alert(`${newName} is already added to phonebook`)
+      }
+      else {
+      const personObject = {
+        name: newName,
+        number: newNumber,
+        id: String(persons.length + 1),
+      }
+      personService
+        .create(personObject)
+        .then(response => {
+          setPersons(persons.concat(response.data))
+          setNewName('')
+          setNewNumber('')
+        })
+      }
+    }
+    return (
+      <form onSubmit={addPerson}>
+        <div>
+          name: 
+          <input
+            value={newName}
+            onChange={handleNameChange}
+          />
+        </div>
+        <div>
+          number:
+          <input
+          value={newNumber}
+          onChange={handleNumberChange}
+          />
+        </div>
+        <div>
+          <button type="submit">add</button>
+        </div>
+      </form>
+    )
+  }
+
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -127,18 +137,11 @@ const App = () => {
           setShowNumbers={setShowNumbers}
         />
         <h2>add new</h2>
-        <PersonForm
-          persons={persons}
-          setPersons={setPersons}
-          newName={newName}
-          setNewName={setNewName}
-          newNumber={newNumber}
-          setNewNumber={setNewNumber}
-        />
+        <PersonForm/>
 
         <h2>Numbers</h2>
         <div>
-          <ListPerson numbersToShow={numbersToShow}/>
+          <ListPerson/>
         </div>
       </div>
 
