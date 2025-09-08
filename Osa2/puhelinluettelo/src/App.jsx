@@ -1,6 +1,5 @@
-import axios from 'axios'
 import { useState, useEffect } from 'react'
-
+import personService from './services/persons'
 
 
 
@@ -67,8 +66,8 @@ const PersonForm = ({persons, setPersons, newName, setNewName, newNumber, setNew
       number: newNumber,
       id: String(persons.length + 1),
     }
-    axios
-      .post('http://localhost:3001/persons', personObject)
+    personService
+      .create(personObject)
       .then(response => {
         setPersons(persons.concat(response.data))
         setNewName('')
@@ -103,15 +102,14 @@ const PersonForm = ({persons, setPersons, newName, setNewName, newNumber, setNew
 const App = () => {
 
   const [persons, setPersons] = useState([])
-  const hook = () => {
-    axios
-      .get('http://localhost:3001/persons')
+
+  useEffect(() => {
+    personService
+      .getAll()
       .then(response => {
         setPersons(response.data)
       })
-  }
-  
-  useEffect(hook, [])
+  } , [])
 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
