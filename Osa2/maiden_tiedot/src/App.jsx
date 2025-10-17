@@ -1,6 +1,18 @@
 import { useState, useEffect } from 'react'
 import countries from '../services/countries'
+import weather from '../services/weather'
 
+const SearchBar = (props) => {
+    return (
+        <>
+            find countries 
+            <input
+                value={props.value}
+                onChange={props.onChange}
+            />
+        </>
+    )
+}
 
 const countryData = (country) => {
     return (
@@ -25,7 +37,16 @@ const getFlag = (country) => {
     )
 }
 
-const showSingleCountry = (country) => {
+const WeatherIcon = ( {code} ) => {
+    const source = `https://openweathermap.org/img/wn/${code}@2x.png`
+    return (
+        <>
+            <img src={source}/>
+        </>  
+    )
+}
+
+const showSingleCountry = (country, weather) => {
     return (
         <>
             <h1>
@@ -42,13 +63,73 @@ const showSingleCountry = (country) => {
             </h2>
                 {countryData(country)}
                 {getFlag(country)}
+                <p>
+                    Temperature {(weather.temperature)} Celsius
+                </p>
+                <p>
+                    <WeatherIcon code = {weather.weather_code}/>
+                </p>
+                <p>
+                    Wind {(weather.wind_speed)} m/s
+                </p>
+                
         </>
 
     )
 }
 
+const ShowSelected = (props) => {
+    if(props.showFiltered==false) {
+        useEffect(() => {
+            props.getLocalWeather(props.showCountry)
+        }, [])
+        return(
+            showSingleCountry(props.showCountry, props.weatherValue)
+        )
+    }
+}
+
+const ListCountries = ( props ) => {
+    const dummy = "Too many matches, specify another filter"
+
+    if(props.showFiltered)
+        
+        if (props.countriesToShow.length > 10)
+        {
+            return (
+                <p>
+                    {dummy}
+                </p>
+            )
+        } else if (props.countriesToShow.length > 1){
+            return (
+                props.countriesToShow.map(country => 
+                    <li key={country.name.common}>
+                        {country.name.common}
+                        <button onClick={()=>{
+                            props.toggleMode(country, false);
+                            props.setCountryToShow(country)
+                            }}>Show</button>
+                    </li>
+                )
+            )
+        } else if (props.countriesToShow.length == 1) {
+            const country = props.countriesToShow[0]
+            useEffect(() => {
+                props.getLocalWeather(country)
+            }, [])
+            return (
+                <div>
+                    {showSingleCountry(country, props.weatherValue)}
+                </div>
+
+            )
+    }
+}
+
 const App = () => {
     const [allCountries, setAllCountries] = useState([])
+    const [weatherValue, setWeather] = useState([])
     const [newCountry, setNewCountry] = useState('')
     const countriesToShow = allCountries.filter(country => country.name.common.toLowerCase().includes(`${newCountry}`.toLowerCase()))
     const [showCountry, setCountryToShow] = useState(countriesToShow[0])
@@ -62,79 +143,45 @@ const App = () => {
                 })
     }, [])
 
+    useEffect(() => {
+    }, [showCountry, showFiltered])
 
-
-    const searchBar = () => {
-        return (
-            <>
-                find countries 
-                <input
-                    value={newCountry}
-                    onChange={handleValueChanged}
-                />
-            </>
-        )
+    const getLocalWeather = (country) => { {
+        const lat = country.capitalInfo.latlng[0]
+        const long = country.capitalInfo.latlng[1]
+        weather
+            .getWeather(lat, long)
+                .then(data => {
+                    setWeather(data)
+                })}
     }
 
     const handleValueChanged = (event) => {
         setNewCountry(event.target.value)
-        toggleMode(null,true)
-    }
-
-    const showSelected = () => {
-        if(!showFiltered) {
-            return(
-                showSingleCountry(showCountry)
-            )
-        }
+        toggleMode(showCountry,true)
     }
 
     const toggleMode = (country, way=true) => {
         setShowFiltered(way)
         setCountryToShow(country)
-    }
-
-    const listCountries = () => {
-        const dummy = "Too many matches, specify another filter"
-            
-        if(showFiltered)
-            
-            if (countriesToShow.length > 10)
-            {
-                return (
-                    <p>
-                        {dummy}
-                    </p>
-                    
-                )
-            } else if (countriesToShow.length > 1){
-                return (
-                    countriesToShow.map(country => 
-                        <li key={country.name.common}>
-                            {country.name.common}
-                            <button onClick={()=>{setShowFiltered(false);setCountryToShow(country)}}>button</button>
-                        </li>
-                    )
-                )
-            } else if (countriesToShow.length == 1) {
-            return (
-                <div>
-                    {showSingleCountry(countriesToShow[0])}
-                </div>
-
-            )
-        }
-    }
+        } 
 
   return (
     <>
-    
-      <div>
-        {searchBar()}
-      </div>
-      {listCountries()}
-      {showSelected()}
-
+        
+        <div>
+            <SearchBar onChange={() => handleValueChanged(event)} value={newCountry}/>
+        </div>
+        <ListCountries showFiltered={showFiltered}
+        countriesToShow={countriesToShow}
+        weatherValue={weatherValue}
+        toggleMode={toggleMode}
+        setCountryToShow={setCountryToShow}
+        getLocalWeather={getLocalWeather}/>
+        <ShowSelected showFiltered={showFiltered}
+        getLocalWeather={getLocalWeather}
+        showCountry={showCountry}
+        weatherValue={weatherValue}/>
     </>
   )
 }

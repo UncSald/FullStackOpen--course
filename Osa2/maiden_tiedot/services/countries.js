@@ -7,9 +7,4 @@ const getAllCountries = () => {
     return data
 }
 
-const certainCountry = (name) => {
-    return axios.get(`${baseURL}/${name}`)
-}
-
-
-export default { getAllCountries, certainCountry}
+export default { getAllCountries }
