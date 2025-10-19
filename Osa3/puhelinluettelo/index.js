@@ -60,6 +60,23 @@ app.post('/api/persons', (request, response) => {
     const newId = Math.round(Math.random() * (10**9-4) + 4)
     const body = request.body
 
+    if (persons.find(person => person.name === body.name) != undefined) {        
+            return response.status(400).json({
+                error: 'name must be unique'
+            })
+    }
+
+    if (!body.name) {
+        return response.status(400).json({
+            error: 'name missing'
+        })
+    }
+
+    if (!body.number) {
+        return response.status(400).json({
+            error: 'number missing'
+        })
+    }
 
     const person = {
         name: body.name,
