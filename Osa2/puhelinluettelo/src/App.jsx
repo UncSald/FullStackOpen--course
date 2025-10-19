@@ -5,7 +5,6 @@ const Notification = ({ err, message }) => {
   if (message === null) {
     return null
   }
-  console.log(err)
   if(err){
     return (
       <div className="error">
@@ -84,7 +83,6 @@ const PersonForm = ({ persons , setPersons, setNewName, newName, newNumber, setN
       personService
         .updateNumber(thisPerson.id, thisPerson.name, newNumber)
         .then(response => {
-          console.log(response.data)
           setPersons(persons.map(person => person.id !== thisPerson.id ? person : response.data))
           setNotificationType(false)
           setNotificationMessage(
@@ -188,9 +186,6 @@ const App = () => {
       </>
     )
   }
-
-
-
 
 
   return (

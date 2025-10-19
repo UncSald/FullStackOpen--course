@@ -1,0 +1,25 @@
+# fly.toml app configuration file generated for puhelinluettelo-wild-darkness-4477 on 2025-10-19T16:47:40+03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'puhelinluettelo-wild-darkness-4477'
+primary_region = 'arn'
+
+[build]
+
+[env]
+  PORT = "3001"
+
+[http_service]
+  internal_port = 3001
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
