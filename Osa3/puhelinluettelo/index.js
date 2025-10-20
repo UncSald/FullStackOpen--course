@@ -13,32 +13,30 @@ app.use(express.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
-}
-
-app.use(unknownEndpoint)
-
-
 app.get('/api/people', (request, response, next) => {
     Person.find({}).then(people => {
         response.json(people)
     })
-    .catch(error => next(error))
 })
 
-// app.get('/info', (request, response) => {
-//     response.send(`<div>
-//                         Phonebook has info for ${people.length} people
-//                     </div>
-//                     <div>
-//                         ${Date()}
-//                     </div>`)
-// })
+app.get('/info', (request, response) => {
+    Person.find({}).then(people => {
+            response.send(`<div>
+                        Phonebook has info for ${people.length} people
+                    </div>
+                    <div>
+                        ${Date()}
+                    </div>`)
+    })
+})
 
 app.get('/api/people/:id', (request, response, next) => {
     Person.findById(request.params.id).then(person => {
-        response.json(person)
+        if (person) {
+            response.json(person)
+        } else {
+            response.status(404).end()
+        }
     })
     .catch(error => next(error))
 })
@@ -63,7 +61,6 @@ app.post('/api/people', (request, response, next) => {
         console.log(`Added ${person.name} number ${person.number} to phonebook`)
         response.json(result)
     })
-    .catch(error => next(error))
 
 })
 
