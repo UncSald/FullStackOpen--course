@@ -19,7 +19,7 @@ const Notification = ({ err, message }) => {
   )
 }
 
-const Person = ({ id, name, number, persons, setPersons, setNotificationMessage, setNotificationType }) => {
+const Person = ({ id, name, number, people, setPeople, setNotificationMessage, setNotificationType }) => {
     const DeletePerson = (event) => {
     event.preventDefault()
     if (window.confirm(`Delete ${name} ?`)) {
@@ -33,8 +33,8 @@ const Person = ({ id, name, number, persons, setPersons, setNotificationMessage,
         window.setTimeout(() => {
             setNotificationMessage(null)
           }, 5000)
-        const newData=persons.filter(person => person.id !=id)
-        setPersons(newData)
+        const newData=people.filter(person => person.id !=id)
+        setPeople(newData)
       })}
   }
   return (
@@ -60,7 +60,7 @@ const Filter = ({numbersShown,setShowNumbers}) => {
 }
 
 
-const PersonForm = ({ persons , setPersons, setNewName, newName, newNumber, setNewNumber, setNotificationMessage, notificationType, setNotificationType}) => {
+const PersonForm = ({ people , setPeople, setNewName, newName, newNumber, setNewNumber, setNotificationMessage, notificationType, setNotificationType}) => {
   const handleNameChange = (event) => {
     setNewName(event.target.value)
   }
@@ -70,7 +70,7 @@ const PersonForm = ({ persons , setPersons, setNewName, newName, newNumber, setN
   }
 
   const nameInBook = (newName) => {
-    const found = persons.find((props) => props.name === newName)
+    const found = people.find((props) => props.name === newName)
     return found
   }
 
@@ -78,12 +78,12 @@ const PersonForm = ({ persons , setPersons, setNewName, newName, newNumber, setN
     event.preventDefault()
     
     if (nameInBook(newName) != undefined) {
-      const thisPerson = persons.find((props) => newName===props.name)
+      const thisPerson = people.find((props) => newName===props.name)
       if(window.confirm(`${thisPerson.name} is already added to the phonebook, replace the old number with a new one?`)){
       personService
         .updateNumber(thisPerson.id, thisPerson.name, newNumber)
         .then(response => {
-          setPersons(persons.map(person => person.id !== thisPerson.id ? person : response.data))
+          setPeople(people.map(person => person.id !== thisPerson.id ? person : response.data))
           setNotificationType(false)
           setNotificationMessage(
             `Updated ${newName}'s number`
@@ -102,12 +102,12 @@ const PersonForm = ({ persons , setPersons, setNewName, newName, newNumber, setN
     const personObject = {
       name: newName,
       number: newNumber,
-      id: String(persons.length + 1),
+      id: String(people.length + 1),
     }
     personService
       .create(personObject)
       .then(response => {
-        setPersons(persons.concat(response.data))
+        setPeople(people.concat(response.data))
         setNewName('')
         setNewNumber('')
         setNotificationMessage(
@@ -143,13 +143,13 @@ const PersonForm = ({ persons , setPersons, setNewName, newName, newNumber, setN
 }
 const App = () => {
 
-  const [persons, setPersons] = useState([])
+  const [people, setPeople] = useState([])
 
   useEffect(() => {
     personService
       .getAll()
       .then(response => {
-        setPersons(response.data)
+        setPeople(response.data)
       })
   } , [])
 
@@ -159,8 +159,8 @@ const App = () => {
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [notificationType, setNotificationType] = useState(false)
   const numbersToShow = numbersShown === ''
-  ? persons
-  : persons.filter(person => person.name.toLowerCase().match(numbersShown.toLowerCase()))
+  ? people
+  : people.filter(person => person.name.toLowerCase().match(numbersShown.toLowerCase()))
 
 
   setTimeout(() => {
@@ -177,8 +177,8 @@ const App = () => {
           id={person.id}
           name={person.name}
           number={person.number}
-          persons={persons}
-          setPersons={setPersons}
+          people={people}
+          setPeople={setPeople}
           setNotificationMessage={setNotificationMessage}
           setNotificationType={setNotificationType}/>
           )
@@ -198,8 +198,8 @@ const App = () => {
         />
         <h2>Add new</h2>
         <PersonForm
-        persons={persons}
-        setPersons={setPersons}
+        people={people}
+        setPeople={setPeople}
         setNewName={setNewName}
         newName={newName}
         newNumber={newNumber}
