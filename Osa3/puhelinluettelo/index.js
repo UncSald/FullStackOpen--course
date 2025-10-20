@@ -12,6 +12,15 @@ app.use(express.static('dist'))
 app.use(express.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'ValidationError') {
+    return response.status(400).send({ error: error.message })
+  }
+
+  next(error)
+}
 
 app.get('/api/people', (request, response, next) => {
     Person.find({}).then(people => {
@@ -45,7 +54,6 @@ app.delete('/api/people/:id', (request, response, next) => {
     Person.findByIdAndDelete(request.params.id).then(person => {
         response.status(204).end()
     })
-
     .catch(error=>next(error))
 })
 
@@ -57,10 +65,12 @@ app.post('/api/people', (request, response, next) => {
         number: body.number,
     })
 
-    person.save().then(result => {
-        console.log(`Added ${person.name} number ${person.number} to phonebook`)
-        response.json(result)
-    })
+    person.save()
+        .then(result => {
+            console.log(`Added ${person.name} number ${person.number} to phonebook`)
+            response.json(result)
+        })
+        .catch(error => next(error))
 
 })
 
@@ -82,6 +92,9 @@ app.put('/api/people/:id', (request, response, next) => {
         })
         .catch(error => next(error))
 })
+
+app.use(errorHandler)
+
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {

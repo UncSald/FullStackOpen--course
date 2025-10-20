@@ -88,7 +88,7 @@ const PersonForm = ({ people , setPeople, setNewName, newName, newNumber, setNew
           setNotificationMessage(
             `Updated ${newName}'s number`
           )
-          setTimeout(() => {
+          window.setTimeout(() => {
             setNotificationMessage(null)
           }, 5000)
         })
@@ -113,9 +113,16 @@ const PersonForm = ({ people , setPeople, setNewName, newName, newNumber, setNew
         setNotificationMessage(
           `Added ${newName}`
         )
-        setTimeout(() => {
-    setNotificationMessage(null)
-  }, 5000)
+        window.setTimeout(() => {
+            setNotificationMessage(null)
+        }, 5000)
+      })
+      .catch(error => {
+        setNotificationType(true)
+        setNotificationMessage(error.response.data.error)
+        window.setTimeout(() => {
+            setNotificationMessage(null)
+        }, 5000)
       })
     }
   }
@@ -163,9 +170,7 @@ const App = () => {
   : people.filter(person => person.name.toLowerCase().match(numbersShown.toLowerCase()))
 
 
-  setTimeout(() => {
-    setNotificationMessage(null)
-  }, 5000)
+
 
 
   const ListPerson = () => {
