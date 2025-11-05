@@ -13,16 +13,16 @@ app.use(express.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 const errorHandler = (error, request, response, next) => {
-  console.error(error.message)
+    console.error(error.message)
 
-  if (error.name === 'ValidationError') {
-    return response.status(400).send({ error: error.message })
-  }
+    if (error.name === 'ValidationError') {
+        return response.status(400).send({ error: error.message })
+    }
 
-  next(error)
+    next(error)
 }
 
-app.get('/api/people', (request, response, next) => {
+app.get('/api/people', (request, response) => {
     Person.find({}).then(people => {
         response.json(people)
     })
@@ -30,31 +30,33 @@ app.get('/api/people', (request, response, next) => {
 
 app.get('/info', (request, response) => {
     Person.find({}).then(people => {
-            response.send(`<div>
-                        Phonebook has info for ${people.length} people
-                    </div>
-                    <div>
-                        ${Date()}
-                    </div>`)
+        response.send(`<div>
+                    Phonebook has info for ${people.length} people
+                </div>
+                <div>
+                    ${Date()}
+                </div>`)
     })
 })
 
 app.get('/api/people/:id', (request, response, next) => {
-    Person.findById(request.params.id).then(person => {
-        if (person) {
-            response.json(person)
-        } else {
-            response.status(404).end()
-        }
-    })
-    .catch(error => next(error))
+    Person
+        .findById(request.params.id).then(person => {
+            if (person) {
+                response.json(person)
+            } else {
+                response.status(404).end()
+            }
+        })
+        .catch(error => next(error))
 })
 
 app.delete('/api/people/:id', (request, response, next) => {
-    Person.findByIdAndDelete(request.params.id).then(person => {
-        response.status(204).end()
-    })
-    .catch(error=>next(error))
+    Person
+        .findByIdAndDelete(request.params.id).then(() => {
+            response.status(204).end()
+        })
+        .catch(error => next(error))
 })
 
 app.post('/api/people', (request, response, next) => {
@@ -87,7 +89,7 @@ app.put('/api/people/:id', (request, response, next) => {
             person.number = number
 
             return person.save().then(updatedPerson => {
-                    response.json(updatedPerson)
+                response.json(updatedPerson)
             })
         })
         .catch(error => next(error))
