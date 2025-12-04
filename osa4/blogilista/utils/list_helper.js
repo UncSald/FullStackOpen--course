@@ -27,9 +27,24 @@ const mostBlogs = (blogs) => {
     return { author: maxAuth, blogs: max }
 }
 
+const mostLikes = (blogs) => {
+    const authors = {}
+    var max = 0
+    var maxAuth = ''
+    lodash.forEach(blogs, function(blog) {
+        authors[blog.author] = (authors[blog.author] || 0) + blog.likes
+        if ( authors[blog.author] > max ) {
+            max = authors[blog.author]
+            maxAuth = blog.author
+        }
+    })
+    return { author: maxAuth, likes: max }
+}
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
-  mostBlogs
+  mostBlogs,
+  mostLikes
 }
