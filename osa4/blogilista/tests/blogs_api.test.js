@@ -47,6 +47,25 @@ test('identifying field is id', async () => {
     assert.ok(blogs[1].id)
 })
 
+test('blog can be added', async () => {
+    const newBlog = {
+            title: "Canonical string reduction",
+            author: "Edsger W. Dijkstra",
+            url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
+            likes: 12,
+        }
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+    const blogs = response.body
+
+    assert.strictEqual(blogs.length, 3)
+})
+
 
 after(async () => {
   await mongoose.connection.close()
