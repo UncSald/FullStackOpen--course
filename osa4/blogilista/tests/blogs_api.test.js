@@ -34,8 +34,11 @@ beforeEach(async () => {
     await blogObject.save()
 })
 
-test('correct amount of blogs are returned', async () => {
-    const response = await api.get('/api/blogs')
+test('correct amount of blogs are returned as json', async () => {
+    const response = await api
+        .get('/api/blogs')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
 
     assert.strictEqual(response.body.length, 2)
     })
