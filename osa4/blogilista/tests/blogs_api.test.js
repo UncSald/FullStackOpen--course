@@ -4,29 +4,16 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
-
+const helper = require('./test_helper')
 const api = supertest(app)
 
-const initialBlogs = [
-    {
-        title: "React patterns",
-        author: "Michael Chan",
-        url: "https://reactpatterns.com/",
-        likes: 7,
-    },
-    {
-        title: "Go To Statement Considered Harmful",
-        author: "Edsger W. Dijkstra",
-        url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
-        likes: 5,
-    }
-]
+
 
 beforeEach(async () => {
     await Blog.deleteMany({})
-    let blogObject = new Blog(initialBlogs[0])
+    let blogObject = new Blog(helper.initialBlogs[0])
     await blogObject.save()
-    blogObject = new Blog(initialBlogs[1])
+    blogObject = new Blog(helper.initialBlogs[1])
     await blogObject.save()
 })
 
@@ -82,8 +69,31 @@ test('defaults to 0 if no likes are given', async () => {
     const response = await api.get('/api/blogs')
     const blogs = response.body
     const addedBlog = blogs.find(blog => blog.title === "First class tests")
-    
     assert.strictEqual(addedBlog.likes, 0)
+})
+
+test('blog without title or url returns Bad Request', async () => {
+    const newBlog = {
+            title: "TDD harms architecture",
+            author: "Robert C. Martin",
+            url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
+            likes: 0,
+        }
+    
+    await api
+        .post('/api/blogs')
+        .send({ author: newBlog.author, url: newBlog.url, likes: newBlog.likes })
+        .expect(400)
+
+    await api
+        .post('/api/blogs')
+        .send({ title: newBlog.title, author: newBlog.author, likes: newBlog.likes})
+        .expect(400)
+    
+    await api
+        .post('/api/blogs')
+        .send({ author: newBlog.author, likes: newBlog.likes})
+        .expect(400)
 })
 
 
