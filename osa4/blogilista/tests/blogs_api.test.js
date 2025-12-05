@@ -5,6 +5,7 @@ const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
 const helper = require('./test_helper')
+const blog = require('../models/blog')
 const api = supertest(app)
 
 
@@ -96,6 +97,38 @@ test('blog without title or url returns Bad Request', async () => {
         .expect(400)
 })
 
+test('a blog can be deleted', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(204)
+
+    const blogsAtEnd = await helper.blogsInDb()
+
+    const contents = blogsAtEnd.map(n => n.title)
+    assert(!contents.includes(blogToDelete.title))
+
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+})
+
+test('no blogs are deleted if a nonexsistent blog is deleted', async () => {
+    const blogToDelete = {
+        id: new mongoose.Types.ObjectId(),
+        title: "Nonexistent blog",
+    }
+    await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(204)
+
+    const blogsAtEnd = await helper.blogsInDb()
+
+    const contents = blogsAtEnd.map(n => n.title)
+    assert(!contents.includes(blogToDelete.title))
+
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+})
 
 after(async () => {
   await mongoose.connection.close()
