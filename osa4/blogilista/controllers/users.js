@@ -3,12 +3,23 @@ const usersRouter = require('express').Router()
 const User = require('../models/user')
 
 usersRouter.get('/', async (request, response) => {
-    const blogs = await User.find(request.body)
-    response.json(blogs)
+    const users = await User.find(request.body)
+    response.json(users)
 })
 
 usersRouter.post('/', async (request, response) => {
   const { username, name, password } = request.body
+    if (username.length == 0) {
+      return response.status(400).json({ error: 'username cannot be empty' })
+    } else if (username.length < 3) {
+      return response.status(400).json({ error: 'username needs to be at least 3 characters long' })
+    }
+
+    if (password.length == 0) {
+      return response.status(400).json({ error: 'password cannot be empty' })
+    } else if (password.length < 3) {
+      return response.status(400).json({ error: 'password needs to be at least 3 characters long' })
+    }
 
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(password, saltRounds)
