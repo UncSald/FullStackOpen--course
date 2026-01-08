@@ -2,12 +2,13 @@ const { test, after, beforeEach } = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+const jwt = require('jsonwebtoken')
 const app = require('../app')
 const Blog = require('../models/blog')
 const helper = require('./test_helper')
 const api = supertest(app)
 
-
+var token=''
 
 beforeEach(async () => {
     await Blog.deleteMany({})
@@ -15,6 +16,12 @@ beforeEach(async () => {
     await blogObject.save()
     blogObject = new Blog(helper.initialBlogs[1])
     await blogObject.save()
+    const user = await helper.usersInDb()
+    const userForToken = {
+        username: user[0].username,
+        id: user[0].id,
+    }
+    token = jwt.sign(userForToken, process.env.SECRET)
 })
 
 test('correct amount of blogs are returned as json', async () => {
@@ -41,15 +48,16 @@ test('blog can be added', async () => {
             url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
             likes: 12,
         }
+
     await api
         .post('/api/blogs')
+        .set('authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
     const response = await api.get('/api/blogs')
     const blogs = response.body
-
     assert.strictEqual(blogs.length, 3)
 })
 
@@ -62,6 +70,7 @@ test('defaults to 0 if no likes are given', async () => {
         }
     await api
         .post('/api/blogs')
+        .set('authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -82,16 +91,19 @@ test('blog without title or url returns Bad Request', async () => {
     
     await api
         .post('/api/blogs')
+        .set('authorization', `Bearer ${token}`)
         .send({ author: newBlog.author, url: newBlog.url, likes: newBlog.likes })
         .expect(400)
 
     await api
         .post('/api/blogs')
+        .set('authorization', `Bearer ${token}`)
         .send({ title: newBlog.title, author: newBlog.author, likes: newBlog.likes})
         .expect(400)
     
     await api
         .post('/api/blogs')
+        .set('authorization', `Bearer ${token}`)
         .send({ author: newBlog.author, likes: newBlog.likes})
         .expect(400)
 })
