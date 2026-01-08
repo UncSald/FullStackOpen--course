@@ -6,23 +6,34 @@ const jwt = require('jsonwebtoken')
 const app = require('../app')
 const Blog = require('../models/blog')
 const helper = require('./test_helper')
+const User = require('../models/user')
 const api = supertest(app)
 
 var token=''
 
 beforeEach(async () => {
     await Blog.deleteMany({})
+    await User.deleteMany({})
+    const userObject = new User({
+        username: 'marc',
+        name: 'marc',
+        password: 'abc'
+    })
+    await userObject.save()
     const user = await helper.usersInDb()
-    let blogObject = new Blog(helper.initialBlogs[0])
-    await blogObject.save()
-    blogObject = new Blog(helper.initialBlogs[1])
-    await blogObject.save()
-    
     const userForToken = {
         username: user[0].username,
         id: user[0].id,
     }
     token = jwt.sign(userForToken, process.env.SECRET)
+    let blog = helper.initialBlogs[0]
+    blog.user = user[0].id
+    let blogObject = new Blog(blog)
+    await blogObject.save()
+    blog = helper.initialBlogs[1]
+    blog.user = user[0].id
+    blogObject = new Blog(blog)
+    await blogObject.save()
 })
 
 test('correct amount of blogs are returned as json', async () => {
@@ -107,6 +118,22 @@ test('blog without title or url returns Bad Request', async () => {
         .set('authorization', `Bearer ${token}`)
         .send({ author: newBlog.author, likes: newBlog.likes})
         .expect(400)
+})
+
+test('a blog cannot be added without a valid token', async () => {
+    const newBlog = {
+            title: "Canonical string reduction",
+            author: "Edsger W. Dijkstra",
+            url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
+            likes: 12,
+        }
+
+    await api
+        .post('/api/blogs')
+        .set('authorization', ``)
+        .send(newBlog)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
 })
 
 test('a blog can be deleted', async () => {
