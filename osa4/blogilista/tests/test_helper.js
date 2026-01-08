@@ -7,12 +7,15 @@ const initialBlogs = [
         author: "Michael Chan",
         url: "https://reactpatterns.com/",
         likes: 7,
+        user: '695fc9db058b1b5c170d96b1',
     },
     {
         title: "Go To Statement Considered Harmful",
         author: "Edsger W. Dijkstra",
         url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
         likes: 5,
+        user: '695fc9db058b1b5c170d96b1',
+
     }
 ]
 

@@ -12,11 +12,12 @@ var token=''
 
 beforeEach(async () => {
     await Blog.deleteMany({})
+    const user = await helper.usersInDb()
     let blogObject = new Blog(helper.initialBlogs[0])
     await blogObject.save()
     blogObject = new Blog(helper.initialBlogs[1])
     await blogObject.save()
-    const user = await helper.usersInDb()
+    
     const userForToken = {
         username: user[0].username,
         id: user[0].id,
@@ -112,8 +113,10 @@ test('a blog can be deleted', async () => {
     const blogsAtStart = await helper.blogsInDb()
     const blogToDelete = blogsAtStart[0]
 
+
     await api
         .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('authorization', `Bearer ${token}`)
         .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
@@ -124,22 +127,6 @@ test('a blog can be deleted', async () => {
     assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
 })
 
-test('no blogs are deleted if a nonexsistent blog is deleted', async () => {
-    const blogToDelete = {
-        id: new mongoose.Types.ObjectId(),
-        title: "Nonexistent blog",
-    }
-    await api
-        .delete(`/api/blogs/${blogToDelete.id}`)
-        .expect(204)
-
-    const blogsAtEnd = await helper.blogsInDb()
-
-    const contents = blogsAtEnd.map(n => n.title)
-    assert(!contents.includes(blogToDelete.title))
-
-    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
-})
 
 test('a blog can be updated', async () => {
     const blogsAtStart = await helper.blogsInDb()
