@@ -3,9 +3,28 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
+const Notification = ({ err, message }) => {
+  if (message === null) {
+    return null
+  }
+  if(err){
+    return (
+      <div className="error">
+        {message}
+      </div>
+    )
+  }
+  return (
+    <div className="notification">
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [errorMessage, setErrorMessage] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [notificationType, setNotificationType] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -37,14 +56,20 @@ const App = () => {
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
       )
+      setNotificationType(false)
+      setNotificationMessage(`${username} logged in successfully`)
+      setTimeout(() => {
+        setNotificationMessage(null)
+      }, 5000)
       setUser(user)
       setUsername('')
       setPassword('')
       blogService.setToken(user.token)
     } catch {
-      setErrorMessage('wrong credentials')
+      setNotificationType(true)
+      setNotificationMessage('wrong username or password')
       setTimeout(() => {
-        setErrorMessage(null)
+        setNotificationMessage(null)
       }, 5000)
     }
   }
@@ -56,12 +81,25 @@ const App = () => {
 
   const handleBlogCreation = async event => {
     event.preventDefault()
-    const blog = {
-      title: title,
-      author: author,
-      url: url
-    }
-    await blogService.create(blog)
+    try {
+      const blog = {
+        title: title,
+        author: author,
+        url: url
+      }
+      await blogService.create(blog)
+      setNotificationType(false)
+      setNotificationMessage(`a new blog ${title} by ${author} added`)
+      setTimeout(() => {
+        setNotificationMessage(null)
+      }, 5000)
+    } catch {
+        setNotificationType(true)
+        setNotificationMessage('blog creation ended with an error')
+        setTimeout(() => {
+          setNotificationMessage(null)
+        }, 5000)
+      }
   }
 
   const logInForm = () => {
@@ -148,8 +186,9 @@ const App = () => {
 
 
 
-  return (    
+  return (
     <div>
+      <Notification err={notificationType} message={notificationMessage}/>
       {!user && logInForm()}
       {user && (
         <div>
