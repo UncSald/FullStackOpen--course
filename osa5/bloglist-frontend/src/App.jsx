@@ -23,7 +23,7 @@ const Notification = ({ err, message }) => {
   )
 }
 
-const LoginForm = ({ username, password, setUsername, setPassword, handleLogin}) => {
+const LoginForm = ({ username, password, setUsername, setPassword, handleLogin }) => {
 
   return (
     <div>
@@ -58,9 +58,9 @@ const LoginForm = ({ username, password, setUsername, setPassword, handleLogin})
 const ShowBlogs = ({ blogs, addLike, deleteBlog }) => {
   return (
     <div>
-        {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} addLike={addLike} deleteBlog={deleteBlog}/>
-        )}
+      {blogs.map(blog =>
+        <Blog key={blog.id} blog={blog} addLike={addLike} deleteBlog={deleteBlog}/>
+      )}
     </div>
   )
 }
@@ -117,56 +117,56 @@ const App = () => {
 
   const createBlog = async (blogObject) => {
     try {
-        blogFormRef.current.toggleVisibility()
-        await blogService.create(blogObject)
+      blogFormRef.current.toggleVisibility()
+      await blogService.create(blogObject)
 
-        setNotificationType(false)
-        setNotificationMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
-        setTimeout(() => {
-            setNotificationMessage(null)
-        }, 5000)
-    } catch (error) {
-        setNotificationType(true)
-        setNotificationMessage(`blog creation ended with an error: ${error}`)
-        setTimeout(() => {
+      setNotificationType(false)
+      setNotificationMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
+      setTimeout(() => {
         setNotificationMessage(null)
-        }, 5000)
+      }, 5000)
+    } catch (error) {
+      setNotificationType(true)
+      setNotificationMessage(`blog creation ended with an error: ${error}`)
+      setTimeout(() => {
+        setNotificationMessage(null)
+      }, 5000)
     }
   }
 
   const addLike = async (blogObject) => {
     try {
-        await blogService.update(blogObject)
+      await blogService.update(blogObject)
 
-        setNotificationType(false)
-        setNotificationMessage(`liked ${blogObject.title}`)
-        setTimeout(() => {
-            setNotificationMessage(null)
-        }, 5000)
-    } catch (error) {
-        setNotificationType(true)
-        setNotificationMessage(`liking blog ended with an error: ${error}`)
-        setTimeout(() => {
+      setNotificationType(false)
+      setNotificationMessage(`liked ${blogObject.title}`)
+      setTimeout(() => {
         setNotificationMessage(null)
-        }, 5000)
+      }, 5000)
+    } catch (error) {
+      setNotificationType(true)
+      setNotificationMessage(`liking blog ended with an error: ${error}`)
+      setTimeout(() => {
+        setNotificationMessage(null)
+      }, 5000)
     }
   }
 
   const deleteBlog = async (blogObject) => {
     try {
-        await blogService.deleteBlog(blogObject)
+      await blogService.deleteBlog(blogObject)
 
-        setNotificationType(false)
-        setNotificationMessage(`successfully deleted ${blogObject.title}`)
-        setTimeout(() => {
-            setNotificationMessage(null)
-        }, 5000)
-    } catch (error) {
-        setNotificationType(true)
-        setNotificationMessage(`deleting blog ended with an error: ${error}`)
-        setTimeout(() => {
+      setNotificationType(false)
+      setNotificationMessage(`successfully deleted ${blogObject.title}`)
+      setTimeout(() => {
         setNotificationMessage(null)
-        }, 5000)
+      }, 5000)
+    } catch (error) {
+      setNotificationType(true)
+      setNotificationMessage(`deleting blog ended with an error: ${error}`)
+      setTimeout(() => {
+        setNotificationMessage(null)
+      }, 5000)
     }
   }
 
@@ -178,7 +178,6 @@ const App = () => {
 
   return (
     <div>
-      
       <Notification err={notificationType} message={notificationMessage}/>
       {!user && (
         <LoginForm
@@ -199,17 +198,16 @@ const App = () => {
           <Togglable buttonLabel='create new blog' ref={blogFormRef}>
             <BlogCreation
               createBlog={createBlog}
-              />
+            />
           </Togglable>
-          
           <ShowBlogs
             blogs={blogs}
             addLike={addLike}
             deleteBlog={deleteBlog}
           />
         </div>
-        )
-       }
+      )
+      }
 
     </div>
   )}
