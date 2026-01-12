@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
-import Togglable from './components/togglable'
+import Togglable from './components/Togglable'
+import BlogCreation from './components/BlogCreation'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -54,46 +55,6 @@ const LoginForm = ({ username, password, setUsername, setPassword, handleLogin})
   )
 }
 
-const NewBlogForm = ({ title, author, url, setTitle, setAuthor, setUrl, handleBlogCreation}) => {
-  return (
-    <div>
-      <form onSubmit={handleBlogCreation}>
-        <div>
-          <label>
-            title
-            <input
-              type="text"
-              value={title}
-              onChange={({ target }) => setTitle(target.value)}
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            author
-            <input
-              type="text"
-              value={author}
-              onChange={({ target }) => setAuthor(target.value)}
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            url
-            <input
-              type="url"
-              value={url}
-              onChange={({ target }) => setUrl(target.value)}
-            />
-          </label>
-        </div>
-        <button type="submit">create</button>
-      </form>
-    </div>
-  )
-}
-
 const ShowBlogs = ({ blogs }) => {
   return (
     <div>
@@ -111,9 +72,6 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
 
   const blogFormRef = useRef()
 
@@ -157,37 +115,33 @@ const App = () => {
     }
   }
 
+  const createBlog = async (blogObject) => {
+        try {
+            blogFormRef.current.toggleVisibility()
+            await blogService.create(blogObject)
+
+            setNotificationType(false)
+            setNotificationMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
+            setTimeout(() => {
+                setNotificationMessage(null)
+            }, 5000)
+        } catch (error) {
+            setNotificationType(true)
+            setNotificationMessage(`blog creation ended with an error: ${error}`)
+            setTimeout(() => {
+            setNotificationMessage(null)
+            }, 5000)
+        }
+  }
+
   const handleLogout = async event => {
     event.preventDefault()
     window.localStorage.clear()
   }
 
-  const handleBlogCreation = async event => {
-    event.preventDefault()
-    try {
-      const blog = {
-        title: title,
-        author: author,
-        url: url
-      }
-      blogFormRef.current.toggleVisibility()
-      await blogService.create(blog)
-      setNotificationType(false)
-      setNotificationMessage(`a new blog ${title} by ${author} added`)
-      setTimeout(() => {
-        setNotificationMessage(null)
-      }, 5000)
-    } catch {
-        setNotificationType(true)
-        setNotificationMessage('blog creation ended with an error')
-        setTimeout(() => {
-          setNotificationMessage(null)
-        }, 5000)
-      }
-  }
-
   return (
     <div>
+      
       <Notification err={notificationType} message={notificationMessage}/>
       {!user && (
         <LoginForm
@@ -206,16 +160,11 @@ const App = () => {
             <button type="logout" onClick={handleLogout}>logout</button>
           </p>
           <Togglable buttonLabel='create new blog' ref={blogFormRef}>
-            <NewBlogForm
-              title={title}
-              author={author}
-              url={url}
-              setTitle={setTitle}
-              setAuthor={setAuthor}
-              setUrl={setUrl}
-              handleBlogCreation={handleBlogCreation}
-            />
+            <BlogCreation
+              createBlog={createBlog}
+              />
           </Togglable>
+          
           <ShowBlogs
             blogs={blogs}
           />
