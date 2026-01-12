@@ -55,11 +55,11 @@ const LoginForm = ({ username, password, setUsername, setPassword, handleLogin})
   )
 }
 
-const ShowBlogs = ({ blogs }) => {
+const ShowBlogs = ({ blogs, addLike }) => {
   return (
     <div>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} addLike={addLike} />
         )}
     </div>
   )
@@ -78,7 +78,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -116,22 +116,40 @@ const App = () => {
   }
 
   const createBlog = async (blogObject) => {
-        try {
-            blogFormRef.current.toggleVisibility()
-            await blogService.create(blogObject)
+    try {
+        blogFormRef.current.toggleVisibility()
+        await blogService.create(blogObject)
 
-            setNotificationType(false)
-            setNotificationMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
-            setTimeout(() => {
-                setNotificationMessage(null)
-            }, 5000)
-        } catch (error) {
-            setNotificationType(true)
-            setNotificationMessage(`blog creation ended with an error: ${error}`)
-            setTimeout(() => {
+        setNotificationType(false)
+        setNotificationMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
+        setTimeout(() => {
             setNotificationMessage(null)
-            }, 5000)
-        }
+        }, 5000)
+    } catch (error) {
+        setNotificationType(true)
+        setNotificationMessage(`blog creation ended with an error: ${error}`)
+        setTimeout(() => {
+        setNotificationMessage(null)
+        }, 5000)
+    }
+  }
+
+  const addLike = async (blogObject) => {
+    try {
+        await blogService.update(blogObject)
+
+        setNotificationType(false)
+        setNotificationMessage(`liked ${blogObject.title}`)
+        setTimeout(() => {
+            setNotificationMessage(null)
+        }, 5000)
+    } catch (error) {
+        setNotificationType(true)
+        setNotificationMessage(`liking blog ended with an error: ${error}`)
+        setTimeout(() => {
+        setNotificationMessage(null)
+        }, 5000)
+    }
   }
 
   const handleLogout = async event => {
@@ -167,6 +185,7 @@ const App = () => {
           
           <ShowBlogs
             blogs={blogs}
+            addLike={addLike}
           />
         </div>
         )
