@@ -55,11 +55,11 @@ const LoginForm = ({ username, password, setUsername, setPassword, handleLogin})
   )
 }
 
-const ShowBlogs = ({ blogs, addLike }) => {
+const ShowBlogs = ({ blogs, addLike, deleteBlog }) => {
   return (
     <div>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} addLike={addLike} />
+          <Blog key={blog.id} blog={blog} addLike={addLike} deleteBlog={deleteBlog}/>
         )}
     </div>
   )
@@ -152,9 +152,28 @@ const App = () => {
     }
   }
 
+  const deleteBlog = async (blogObject) => {
+    try {
+        await blogService.deleteBlog(blogObject)
+
+        setNotificationType(false)
+        setNotificationMessage(`successfully deleted ${blogObject.title}`)
+        setTimeout(() => {
+            setNotificationMessage(null)
+        }, 5000)
+    } catch (error) {
+        setNotificationType(true)
+        setNotificationMessage(`deleting blog ended with an error: ${error}`)
+        setTimeout(() => {
+        setNotificationMessage(null)
+        }, 5000)
+    }
+  }
+
   const handleLogout = async event => {
     event.preventDefault()
     window.localStorage.clear()
+    blogService.setToken('')
   }
 
   return (
@@ -186,6 +205,7 @@ const App = () => {
           <ShowBlogs
             blogs={blogs}
             addLike={addLike}
+            deleteBlog={deleteBlog}
           />
         </div>
         )

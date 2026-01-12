@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-const Blog = ({ blog, addLike }) => {
+const Blog = ({ blog, addLike, deleteBlog }) => {
   const [visibility, setVisibility] = useState(false)
 
   const toggleVisibility = () => {
@@ -13,12 +13,22 @@ const Blog = ({ blog, addLike }) => {
     addLike(newBlog)
   }
 
+  const remove = () => {
+    window.confirm(`remove ${blog.title} by ${blog.user.name}`)
+    deleteBlog(blog)
+  }
+
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
     border: 'solid',
     borderWidth: 1,
     marginBottom: 5
+  }
+
+  const deleteStyle = {
+    backgroundColor: 'red',
+    borderRadius: '8px',
   }
 
   if (visibility) {
@@ -34,6 +44,9 @@ const Blog = ({ blog, addLike }) => {
           <button onClick={likeBlog}>like</button>
         </div>
         <div>{blog.user.name}</div>
+        <div>
+          <button style={deleteStyle} onClick={remove}>delete</button>
+        </div>
       </div>
     )
   }
