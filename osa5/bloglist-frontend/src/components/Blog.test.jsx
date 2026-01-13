@@ -18,14 +18,14 @@ test('renders content', () => {
 
 test('clicking the show button opens blog info', async () => {
   const blog = {
-  title: "Canonical string reduction",
-  author: "Edsger W. Dijkstra",
-  url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
-  likes: 12,
-  user: {
-    username: 'macou',
-    name:'macou'
-  }
+    title: "Canonical string reduction",
+    author: "Edsger W. Dijkstra",
+    url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
+    likes: 12,
+    user: {
+        username: 'macou',
+        name:'macou'
+    }
   }
 
   render(
@@ -41,4 +41,34 @@ test('clicking the show button opens blog info', async () => {
   const username = screen.getByText('macou')
 
   expect(url, likes, username).toBeDefined()
+})
+
+test('clicking the like button twice calls the handler twice', async () => {
+  const blog = {
+    title: "Canonical string reduction",
+    author: "Edsger W. Dijkstra",
+    url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
+    likes: 12,
+    user: {
+        username: 'macou',
+        name:'macou'
+    }
+  }
+  
+  const mockHandler = vi.fn()
+
+  render(
+    <Blog blog={blog} addLike={mockHandler}/>
+  )
+
+  const user = userEvent.setup()
+  const button = screen.getByText('show')
+  await user.click(button)
+
+  const like = screen.getByText('like')
+  await user.click(like)
+  await user.click(like)
+
+
+  expect(mockHandler.mock.calls).toHaveLength(2)
 })
