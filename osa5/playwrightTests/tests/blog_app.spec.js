@@ -52,7 +52,7 @@ describe('Blog app', () => {
       await page.getByLabel('author').fill('Robert C. Martin')
       await page.getByLabel('url').fill('http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll')
       await page.getByRole('button', { name: 'create' }).click()
-      await expect(page.getByText('First class tests')).toBeVisible()
+      await expect(page.getByText('First class tests Robert C. Martin')).toBeVisible()
     })
   })
 
