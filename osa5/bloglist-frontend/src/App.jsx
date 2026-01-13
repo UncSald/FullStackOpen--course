@@ -119,7 +119,8 @@ const App = () => {
     try {
       blogFormRef.current.toggleVisibility()
       await blogService.create(blogObject)
-
+      const updated = await blogService.getAll()
+      setBlogs(updated)
       setNotificationType(false)
       setNotificationMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
       setTimeout(() => {
