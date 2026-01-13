@@ -2,7 +2,6 @@ const { test, expect, beforeEach, describe } = require('@playwright/test')
 
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
-    await page.goto('http://localhost:3003')
     await request.post('http://localhost:3003/api/testing/reset')
     await request.post('http://localhost:3003/api/users', {
       data: {
@@ -37,6 +36,23 @@ describe('Blog app', () => {
       await page.getByLabel('password').fill('salakavala')
       await page.getByRole('button', { name: 'login' }).click()
       await expect(page.getByText('log in to application')).toBeVisible()
+    })
+  })
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+      await page.getByLabel('username').fill('mluukkai')
+      await page.getByLabel('password').fill('salainen')
+      await page.getByRole('button', { name: 'login' }).click()
+    })
+    
+    test('a new blog can be created', async ({ page }) => {
+      await page.getByRole('button', { name: 'create new blog' }).click()
+      await page.getByLabel('title').fill('First class tests')
+      await page.getByLabel('author').fill('Robert C. Martin')
+      await page.getByLabel('url').fill('http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll')
+      await page.getByRole('button', { name: 'create' }).click()
+      await expect(page.getByText('First class tests')).toBeVisible()
     })
   })
 
