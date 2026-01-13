@@ -33,7 +33,7 @@ const Blog = ({ blog, addLike, deleteBlog }) => {
 
   if (visibility) {
     return (
-      <div style={blogStyle}>
+      <li className='blog' style={blogStyle}>
         {blog.title} {blog.author}
         <button onClick={toggleVisibility}>hide</button>
         <div>
@@ -47,15 +47,15 @@ const Blog = ({ blog, addLike, deleteBlog }) => {
         <div>
           <button style={deleteStyle} onClick={remove}>delete</button>
         </div>
-      </div>
+      </li>
     )
   }
 
   return (
-    <div style={blogStyle}>
+    <li className='blog' style={blogStyle}>
       {blog.title} {blog.author}
       <button onClick={toggleVisibility}>show</button>
-    </div>
+    </li>
   )
 }
 
