@@ -55,11 +55,11 @@ const LoginForm = ({ username, password, setUsername, setPassword, handleLogin }
   )
 }
 
-const ShowBlogs = ({ blogs, addLike, deleteBlog }) => {
+const ShowBlogs = ({ blogs, addLike, deleteBlog, loggedIn }) => {
   return (
     <div>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} addLike={addLike} deleteBlog={deleteBlog}/>
+        <Blog key={blog.id} blog={blog} addLike={addLike} deleteBlog={deleteBlog} loggedIn={loggedIn}/>
       )}
     </div>
   )
@@ -176,6 +176,7 @@ const App = () => {
     event.preventDefault()
     window.localStorage.clear()
     blogService.setToken('')
+    setUser(null)
   }
 
   return (
@@ -206,6 +207,7 @@ const App = () => {
             blogs={blogs}
             addLike={addLike}
             deleteBlog={deleteBlog}
+            loggedIn={user}
           />
         </div>
       )

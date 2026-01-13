@@ -10,6 +10,13 @@ describe('Blog app', () => {
         password: 'salainen'
       }
     })
+    await request.post('http://localhost:3003/api/users', {
+      data: {
+        name: 'Marc Alingue',
+        username: 'macou',
+        password: 'salasana'
+      }
+    })
     await page.goto('http://localhost:5173')
   })
 
@@ -78,7 +85,17 @@ describe('Blog app', () => {
       page.on('dialog', dialog => dialog.accept())
       await expect(page.getByText('successfully deleted First class tests')).toBeVisible()
       await expect(page.getByText('First class tests Robert C. Martin')).toBeHidden()
-
+    })
+    test('the delete button can only be seen by the creator', async ({ page }) => {
+      await page.getByRole('button', { name: 'show' }).click()
+      await expect(page.getByRole('button', { name: 'delete' })).toBeVisible()
+      await page.getByRole('button', { name: 'logout' }).click()
+      await expect(page.getByText('log in to application')).toBeVisible()
+      await page.getByLabel('username').fill('macou')
+      await page.getByLabel('password').fill('salasana')
+      await page.getByRole('button', { name: 'login' }).click()
+      await page.getByRole('button', { name: 'show' }).click()
+      await expect(page.getByRole('button', { name: 'delete' })).toBeHidden()
     })
   })
 
