@@ -10,7 +10,7 @@ describe('Blog app', () => {
         password: 'salainen'
       }
     })
-
+    await page.goto('http://localhost:3003')
     await page.goto('http://localhost:5173')
   })
 
