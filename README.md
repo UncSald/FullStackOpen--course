@@ -8,5 +8,11 @@ Exercises for the FulllStackOpen -course.
 
  - [Osa 2](https://github.com/UncSald/FullStackOpen--course/tree/main/osa2)
 
- - [Osa3](https://github.com/UncSald/FullStackOpen--course/tree/main/osa2)
+ - [Osa3](https://github.com/UncSald/FullStackOpen--course/tree/main/osa3)
     - [Linkki sovellukseen](https://puhelinluettelo-wild-darkness-4477.fly.dev)
+ 
+ - [Osa3](https://github.com/UncSald/FullStackOpen--course/tree/main/osa4)
+ - 
+ - [Osa3](https://github.com/UncSald/FullStackOpen--course/tree/main/osa5)
+ - 
+ - [Osa3](https://github.com/UncSald/FullStackOpen--course/tree/main/osa6)
