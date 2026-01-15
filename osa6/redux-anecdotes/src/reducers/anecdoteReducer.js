@@ -33,11 +33,24 @@ const reducer = (state = initialState, action) => {
         votes: anecdoteToChange.votes+1
       }
       return state.map(anecdote => (anecdote.id !== id ? anecdote : changedAnecdote))
-
     default:
       return state
   }
 
+}
+
+export const newAnecdote = anecdote => {
+  return ({
+    type: 'CREATE ANECDOTE',
+    payload: { anecdote }
+  })
+}
+
+export const voteAnecdote = id => {
+  return({
+    type: 'VOTE ANECDOTE',
+    payload: { id }
+  })
 }
 
 export default reducer
